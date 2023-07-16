@@ -97,9 +97,7 @@ public class ManageTableMenu extends HostMenu {
         }
         else {
             System.out.println("Tables:");
-            tables.forEach(table -> {
-                System.out.printf("Table %d: %d seats | Type: %s\n", table.number(), table.capacity(), table.type());
-            });
+            tables.forEach(table -> System.out.printf(table.toString()));
         }
         return tables.size();
     }
