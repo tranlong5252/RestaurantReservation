@@ -1,35 +1,8 @@
 package tranlong5252.menu;
+public class LoginMenu extends ClientMenu {
 
-import tranlong5252.RestaurantsManager;
-
-public class LoginMenu {
-    private final RestaurantsManager main;
-
-    public LoginMenu(RestaurantsManager main) {
-        this.main = main;
-        int choice = -1;
-        do {
-            try {
-                System.out.println("1. Login");
-                System.out.println("2. Register");
-                System.out.println("0. Exit");
-                System.out.print("Your choice: ");
-                choice = Integer.parseInt(main.getScanner().nextLine());
-                switch (choice) {
-                    case 1 -> login();
-                    case 2 -> register();
-                    case 0 -> exit();
-                    default -> System.out.println("Invalid choice!");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid choice!");
-            }
-        } while (choice != 0);
-    }
-
-    private void exit() {
-        System.out.println("Goodbye!");
-        System.exit(0);
+    public LoginMenu() {
+        showMenu();
     }
 
     private void login() {
@@ -43,7 +16,7 @@ public class LoginMenu {
         }
         System.out.println("Login success!");
         main.setUsername(username);
-        new MainMenu(main);
+        new MainMenu();
     }
 
     private void register() {
@@ -59,5 +32,30 @@ public class LoginMenu {
         } else {
             System.out.println("Password not match!");
         }
+    }
+
+    @Override
+    public void showMenu() {
+        int choice = -1;
+        do {
+            try {
+                System.out.println("1. Login");
+                System.out.println("2. Register");
+                System.out.println("0. Exit");
+                System.out.print("Your choice: ");
+                choice = Integer.parseInt(main.getScanner().nextLine());
+                switch (choice) {
+                    case 1 -> login();
+                    case 2 -> register();
+                    case 0 -> {
+                        System.out.println("Goodbye!");
+                        return;
+                    }
+                    default -> System.out.println("Invalid choice!");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid choice!");
+            }
+        } while (choice != 0);
     }
 }

@@ -1,16 +1,10 @@
-plugins {
-    id("java")
-}
-
 group = "tranlong5252"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-}
+allprojects {
+    apply(plugin = "java")
 
-dependencies {
-    //jdbc-mysql
-    implementation("mysql:mysql-connector-java:8.0.26")
-
+    repositories {
+        mavenCentral()
+    }
 }

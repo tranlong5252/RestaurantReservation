@@ -1,9 +1,8 @@
 package tranlong5252;
 
 public enum ReserveStatus {
-	PENDING(1),
-	CONFIRMED(2),
-	REJECTED(3)
+	CONFIRMED(1),
+	REJECTED(2)
 	;
 
 	private final int id;
