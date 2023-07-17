@@ -1,5 +1,8 @@
 package tranlong5252;
 
+import tranlong5252.objects.Reservation;
+import tranlong5252.objects.User;
+import tranlong5252.objects.Table;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -79,6 +82,29 @@ public class MySQL {
 			cleanup(result, statement);
 		}
 		return false;
+	}
+
+	public User getUser(String username) {
+		PreparedStatement statement = null;
+		ResultSet result = null;
+		try {
+			statement = sql.prepareStatement(GET_USER);
+			statement.setString(1, username);
+			result = statement.executeQuery();
+			if (result.next()) {
+				return new User(
+						result.getString("username"),
+						result.getString("password"),
+						result.getString("email"),
+						result.getTimestamp("created_time"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(result, statement);
+		}
+		return null;
 	}
 
 	public void register(String username, String password) {

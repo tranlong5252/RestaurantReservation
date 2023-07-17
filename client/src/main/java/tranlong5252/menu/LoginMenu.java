@@ -22,16 +22,21 @@ public class LoginMenu extends ClientMenu {
     private void register() {
         System.out.print("Username: ");
         String username = main.getScanner().nextLine();
+        if (main.getMySQL().getUser(username) != null) {
+            System.out.println("Username already exists!");
+            return;
+        }
         System.out.print("Password: ");
         String password = main.getScanner().nextLine();
         System.out.print("Confirm password: ");
         String confirm = main.getScanner().nextLine();
-        if (password.equals(confirm)) {
-            System.out.println("Register success!");
-            main.getMySQL().register(username, password);
-        } else {
+        if (!password.equals(confirm)) {
             System.out.println("Password not match!");
+            return;
+
         }
+        System.out.println("Register success!");
+        main.getMySQL().register(username, password);
     }
 
     @Override
@@ -41,13 +46,19 @@ public class LoginMenu extends ClientMenu {
             try {
                 System.out.println("1. Login");
                 System.out.println("2. Register");
-                System.out.println("0. Exit");
+                System.out.println("3. Exit");
                 System.out.print("Your choice: ");
                 choice = Integer.parseInt(main.getScanner().nextLine());
                 switch (choice) {
-                    case 1 -> login();
-                    case 2 -> register();
-                    case 0 -> {
+                    case 1 -> {
+                        login();
+                        showMenu();
+                    }
+                    case 2 -> {
+                        register();
+                        showMenu();
+                    }
+                    case 3 -> {
                         System.out.println("Goodbye!");
                         return;
                     }
