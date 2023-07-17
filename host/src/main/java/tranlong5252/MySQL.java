@@ -1,5 +1,6 @@
 package tranlong5252;
 
+import tranlong5252.objects.Reservation;
 import tranlong5252.objects.Table;
 
 import java.sql.*;
@@ -8,12 +9,17 @@ import java.util.List;
 
 public class MySQL {
 	private Connection sql;
-	
+
 	//region QUERIES
 	//INFO
 	private static final String RESTAURANT_DETAILS = "SELECT * FROM `restaurant` WHERE `id` = 0";
 	private static final String GET_TABLES = "SELECT * FROM `table`";
 	private static final String GET_TABLE = "SELECT * FROM `table` WHERE `number` = ?";
+	private static final String GET_RESERVATIONS = """
+		SELECT * FROM `reservation` WHERE `reserve_time` > ?
+		ORDER BY reserve_time
+	""";
+	private static final String GET_RESERVATION = "SELECT * FROM `reservation` WHERE `id` = ?";
 
 	//UPDATE
 	private static final String EDIT_RESTAURANT_DETAIL = """
@@ -27,6 +33,7 @@ public class MySQL {
 		ON DUPLICATE KEY UPDATE `capacity` = @capacity, `type` = @type
 	""";
 
+	private static final String CHANGE_STATUS_RESERVATION = "UPDATE `reservation` SET `status` = ? WHERE `id` = ?";
 	//endregion
 
 	public MySQL(String host, int port, String dbname, String user, String pwd) {
@@ -34,7 +41,7 @@ public class MySQL {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			try {
-			Class.forName("com.mysql.jdbc.Driver");
+				Class.forName("com.mysql.jdbc.Driver");
 			} catch (ClassNotFoundException ex) {
 				ex.printStackTrace();
 			}
@@ -63,7 +70,7 @@ public class MySQL {
 		}
 	}
 
-
+	//region restaurant detail
 	public boolean existRestaurant() {
 		PreparedStatement statement = null;
 		ResultSet result = null;
@@ -114,7 +121,9 @@ public class MySQL {
 			cleanup(null, statement);
 		}
 	}
+	//endregion
 
+	//region tables
 	public List<Table> getTables() {
 		List<Table> tables = new ArrayList<>();
 		PreparedStatement statement = null;
@@ -124,9 +133,9 @@ public class MySQL {
 			result = statement.executeQuery();
 			while (result.next()) {
 				tables.add(new Table(
-						result.getInt("number"),
-						result.getInt("capacity"),
-						result.getString("type")
+								result.getInt("number"),
+								result.getInt("capacity"),
+								result.getString("type")
 						)
 				);
 			}
@@ -178,4 +187,78 @@ public class MySQL {
 			cleanup(null, statement);
 		}
 	}
+	//endregion
+
+	//region reservations
+	public List<Reservation> getReservations() {
+		List<Reservation> reservations = new ArrayList<>();
+		PreparedStatement statement = null;
+		ResultSet result = null;
+		try {
+			statement = sql.prepareStatement(GET_RESERVATIONS);
+			result = statement.executeQuery();
+			while (result.next()) {
+				reservations.add(new Reservation(
+						result.getInt("id"),
+						result.getInt("table_number"),
+						result.getString("customer"),
+						result.getInt("no_of_people"),
+						result.getTimestamp("reserve_time"),
+						result.getTimestamp("create_time"),
+						ReserveStatus.getById(result.getInt("status"))
+						)
+				);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(result, statement);
+		}
+		return reservations;
+	}
+
+	public Reservation getReservation(int id) {
+		Reservation reservation = null;
+		PreparedStatement statement = null;
+		ResultSet result = null;
+		try {
+			statement = sql.prepareStatement(GET_RESERVATION);
+			statement.setInt(1, id);
+			result = statement.executeQuery();
+			if (result.next()) {
+				reservation = new Reservation(
+						result.getInt("id"),
+						result.getInt("table_number"),
+						result.getString("customer"),
+						result.getInt("no_of_people"),
+						result.getTimestamp("reserve_time"),
+						result.getTimestamp("create_time"),
+						ReserveStatus.getById(result.getInt("status"))
+				);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(result, statement);
+		}
+		return reservation;
+	}
+
+	public void changeStatusReservation(Reservation reservation, ReserveStatus status) {
+		PreparedStatement statement = null;
+		try {
+			statement = sql.prepareStatement(CHANGE_STATUS_RESERVATION);
+			statement.setInt(1, status.getId());
+			statement.setInt(2, reservation.id());
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(null, statement);
+		}
+	}
+	//endregion
 }

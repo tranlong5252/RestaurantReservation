@@ -19,7 +19,7 @@ public class MainMenu extends HostMenu {
             switch (choice) {
                 case 1 -> new ManageDetailsMenu(this);
                 case 2 -> new ManageTableMenu(this);
-                case 3 -> new ReservationMenu(this);
+                case 3 -> new ReservationsMenu(this);
                 case 4 -> new CustomersMenu(this);
                 case 5 -> System.out.println("Goodbye!");
                 default -> {
