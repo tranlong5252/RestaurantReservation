@@ -200,7 +200,7 @@ public class MySQL {
 			while (result.next()) {
 				reservations.add(new Reservation(
 						result.getInt("id"),
-						result.getInt("table_number"),
+						getTable(result.getInt("table_number")),
 						result.getString("customer"),
 						result.getInt("no_of_people"),
 						result.getTimestamp("reserve_time"),
@@ -229,7 +229,7 @@ public class MySQL {
 			if (result.next()) {
 				reservation = new Reservation(
 						result.getInt("id"),
-						result.getInt("table_number"),
+						getTable(result.getInt("table_number")),
 						result.getString("customer"),
 						result.getInt("no_of_people"),
 						result.getTimestamp("reserve_time"),
