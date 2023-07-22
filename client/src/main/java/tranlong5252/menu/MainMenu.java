@@ -13,7 +13,11 @@ public class MainMenu extends ClientMenu {
 	@Override
 	public void showMenu() {
 		try {
-			var customer = main.getMySQL().getCustomer(main.getUsername());
+			String username = main.getUsername();
+			if (username == null) {
+				return;
+			}
+			var customer = main.getMySQL().getCustomer(username);
 			if (customer == null) {
 				setupCustomer(null, null, null);
 				return;
@@ -26,16 +30,18 @@ public class MainMenu extends ClientMenu {
 				return;
 			}
 			System.out.println("1. Reservations");
-			System.out.println("2. Edit information");
+			System.out.println("2. Your information");
 			System.out.println("3. Logout");
 			System.out.println("4. Exit");
 			System.out.print("Your choice: ");
 			int choice = Integer.parseInt(main.getScanner().nextLine());
 			switch (choice) {
 				case 1 -> new ReserveMenu(this);
+				case 2 -> new InformationMenu(this);
 				case 3 -> {
 					System.out.println("Goodbye!");
 					main.setUsername(null);
+					new LoginMenu();
 				}
 				case 4 -> {
 					System.out.println("Goodbye!");
