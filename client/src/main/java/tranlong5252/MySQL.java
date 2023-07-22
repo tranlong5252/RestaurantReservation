@@ -129,7 +129,6 @@ public class MySQL {
 				return new User(
 						result.getString("username"),
 						result.getString("password"),
-						result.getString("email"),
 						result.getTimestamp("create_time"),
 						getCustomer(user));
 			}
