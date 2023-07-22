@@ -66,15 +66,11 @@ public class ReserveMenu extends ClientMenu {
 		}
 		System.out.println("Notice: Can not cancel reservation 2 hours before reservation time");
 
-		System.out.print("Reservation ID: ");
-		int id = Integer.parseInt(main.getScanner().nextLine());
-		Reservation reservation = main.getMySQL().getReservation(id);
+		Reservation reservation = inputReservation();
 		if (reservation == null) {
-			System.out.println("Reservation not found!");
 			return;
 		}
-		System.out.println(reservation);
-		if (reservation.reserveTime().toLocalDateTime().isBefore(LocalDateTime.now().plusHours(2))) {
+		if (reservation.reserveTime().toLocalDateTime().isBefore(LocalDateTime.now().minusHours(2))) {
 			System.out.println("Can not cancel reservation 2 hours before reservation time");
 			return;
 		}
@@ -91,19 +87,28 @@ public class ReserveMenu extends ClientMenu {
 		}
 		System.out.println("Notice: Can not edit reservation 2 hours before reservation time");
 
-		System.out.print("Reservation ID: ");
-		int id = Integer.parseInt(main.getScanner().nextLine());
-		Reservation reservation = main.getMySQL().getReservation(id);
+		Reservation reservation = inputReservation();
 		if (reservation == null) {
-			System.out.println("Reservation not found!");
 			return;
 		}
-		System.out.println(reservation);
-		if (reservation.reserveTime().toLocalDateTime().isBefore(LocalDateTime.now().plusHours(2))) {
+		if (reservation.reserveTime().toLocalDateTime().isBefore(LocalDateTime.now().minusHours(2))) {
 			System.out.println("Can not edit reservation 2 hours before reservation time");
 			return;
 		}
+		if (reservation.status().equals(ReserveStatus.CANCELLED) || reservation.status().equals(ReserveStatus.REJECTED)) {
+			System.out.println("Can not edit cancelled reservation!");
+			return;
+		}
 		editReservation(reservation);
+	}
+
+	private Reservation inputReservation() {
+		System.out.print("Reservation ID: ");
+		int id = Integer.parseInt(main.getScanner().nextLine());
+		Reservation reservation = main.getMySQL().getReservation(id);
+		if (reservation == null) System.out.println("Reservation not found!");
+		else System.out.println(reservation);
+		return reservation;
 	}
 
 	private void editReservation(Reservation reservation) {
