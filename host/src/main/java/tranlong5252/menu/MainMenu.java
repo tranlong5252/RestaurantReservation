@@ -21,7 +21,10 @@ public class MainMenu extends HostMenu {
                 case 2 -> new ManageTableMenu(this);
                 case 3 -> new ReservationsMenu(this);
                 case 4 -> new CustomersMenu(this);
-                case 5 -> System.out.println("Goodbye!");
+                case 5 -> {
+                    System.out.println("Goodbye!");
+                    System.exit(0);
+                }
                 default -> {
                     System.out.println("Invalid choice!");
                     showMenu();

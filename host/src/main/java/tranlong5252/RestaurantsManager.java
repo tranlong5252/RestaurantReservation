@@ -19,16 +19,7 @@ public class RestaurantsManager {
             mySQL = new MySQL("localhost", 3306, "restaurants", "root", "123!");
             System.out.println("Welcome to Restaurant Reservation System");
             if (!mySQL.existRestaurant()) {
-                System.out.println("Create your restaurant:");
-                System.out.println("Name: ");
-                String name = input();
-                System.out.println("Address: ");
-                String address = input();
-                System.out.println("Phone number: ");
-                String phone = input();
-                System.out.println("Email: ");
-                String email = scanner.nextLine();
-                mySQL.updateRestaurantDetail(name, address, phone, email);
+                createRestaurant(null, null, null);
             }
             new MainMenu();
         } catch (Exception ex) {
@@ -53,5 +44,35 @@ public class RestaurantsManager {
         String s = scanner.nextLine();
         if (s.isBlank()) s = input();
         return s;
+    }
+    
+    private void createRestaurant(String name, String address, String phone) {
+        System.out.println("Create your restaurant");
+        if (name == null) {
+            System.out.print("Restaurant name: ");
+            name = input();
+        }
+        if (address == null) {
+            System.out.println("Restaurant address: ");
+            address = input();
+        }
+        if (phone == null) {
+            System.out.print("Restaurant phone: ");
+            phone = input();
+            if (!Utils.validatePhoneNumber(phone)) {
+                System.out.println("Invalid phone number!");
+                createRestaurant(name, address, null);
+                return;
+            }
+        }
+
+        System.out.print("Restaurant email: ");
+        String email = input();
+        if (!Utils.validateEmail(email)) {
+            System.out.println("Invalid email!");
+            createRestaurant(name, address, phone);
+            return;
+        }
+        mySQL.updateRestaurantDetail(name, address, phone, email);
     }
 }

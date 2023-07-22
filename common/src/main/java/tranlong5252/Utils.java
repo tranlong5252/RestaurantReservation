@@ -1,7 +1,6 @@
 package tranlong5252;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 public class Utils {
 
@@ -26,5 +25,9 @@ public class Utils {
 
 	public static DateTimeFormatter getDateTimeFormatter() {
 		return DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	}
+
+	public static boolean validateEmail(String email) {
+		return email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
 	}
 }
