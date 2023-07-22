@@ -64,7 +64,7 @@ public class CustomersMenu extends HostMenu {
 				main.getMySQL().suspendCustomer(customer, true);
 				System.out.println("Customer un-suspended!");
 			} else {
-				System.out.println("Canceled!");
+				System.out.println("Cancelled!");
 			}
 		} catch (NumberFormatException e) {
 			System.out.println("Invalid choice!");
@@ -99,7 +99,7 @@ public class CustomersMenu extends HostMenu {
 				main.getMySQL().suspendCustomer(customer, true);
 				System.out.println("Customer suspended!");
 			} else {
-				System.out.println("Canceled!");
+				System.out.println("Cancelled!");
 			}
 		} catch (NumberFormatException e) {
 			System.out.println("Invalid choice!");

@@ -1,5 +1,7 @@
 package tranlong5252.menu;
 
+import tranlong5252.Utils;
+
 import java.util.HashMap;
 
 public class ManageDetailsMenu extends HostMenu {
@@ -61,6 +63,16 @@ public class ManageDetailsMenu extends HostMenu {
 		String newValue = main.getScanner().nextLine();
 		if (newValue.isBlank()) {
 			System.out.println("Invalid input! Try again.");
+			edit(field);
+			return;
+		}
+		if (field.equals("email") && !Utils.validateEmail(newValue)) {
+			System.out.println("Invalid email! Try again.");
+			edit(field);
+			return;
+		}
+		if (field.equals("phone") && !Utils.validatePhoneNumber(newValue)) {
+			System.out.println("Invalid phone! Try again.");
 			edit(field);
 			return;
 		}

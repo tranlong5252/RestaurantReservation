@@ -51,7 +51,7 @@ public class ManageTableMenu extends HostMenu {
             System.out.print("Table number (Type \"Exit\" to cancel): ");
             String prompt = main.getScanner().nextLine();
             if (prompt.equalsIgnoreCase("exit")) {
-                System.out.println("Canceled!");
+                System.out.println("Cancelled!");
                 return;
             }
             int number = Integer.parseInt(prompt);
