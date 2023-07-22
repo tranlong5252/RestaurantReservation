@@ -19,14 +19,14 @@ public class RestaurantsManager {
             mySQL = new MySQL("localhost", 3306, "restaurants", "root", "123!");
             System.out.println("Welcome to Restaurant Reservation System");
             if (!mySQL.existRestaurant()) {
-                System.out.println("Create your restaurant :");
-                System.out.println("Name:");
+                System.out.println("Create your restaurant:");
+                System.out.println("Name: ");
                 String name = input();
-                System.out.println("Address:");
+                System.out.println("Address: ");
                 String address = input();
-                System.out.println("Phone number:");
+                System.out.println("Phone number: ");
                 String phone = input();
-                System.out.println("Email:");
+                System.out.println("Email: ");
                 String email = scanner.nextLine();
                 mySQL.updateRestaurantDetail(name, address, phone, email);
             }

@@ -1,7 +1,9 @@
 package tranlong5252;
 
+import tranlong5252.objects.Customer;
 import tranlong5252.objects.Reservation;
 import tranlong5252.objects.Table;
+import tranlong5252.objects.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,11 +14,15 @@ public class MySQL {
 
 	//region QUERIES
 	//INFO
+	private static final String GET_CUSTOMERS = "SELECT * FROM `customer`";
+	private static final String GET_AVAILABLE_CUSTOMERS = "SELECT * FROM `customer` WHERE `is_suspended` = ?";
+	private static final String GET_USER = "SELECT * FROM `user` WHERE `username` = ?";
+	private static final String GET_CUSTOMER = "SELECT * FROM `customer` WHERE `username` = ?";
 	private static final String RESTAURANT_DETAILS = "SELECT * FROM `restaurant` WHERE `id` = 0";
 	private static final String GET_TABLES = "SELECT * FROM `table`";
 	private static final String GET_TABLE = "SELECT * FROM `table` WHERE `number` = ?";
 	private static final String GET_RESERVATIONS = """
-		SELECT * FROM `reservation` WHERE `reserve_time` > ?
+		SELECT * FROM `reservation` WHERE `reserve_time` > CURRENT_TIMESTAMP()
 		ORDER BY reserve_time
 	""";
 	private static final String GET_RESERVATION = "SELECT * FROM `reservation` WHERE `id` = ?";
@@ -34,6 +40,7 @@ public class MySQL {
 	""";
 
 	private static final String CHANGE_STATUS_RESERVATION = "UPDATE `reservation` SET `status` = ? WHERE `id` = ?";
+	private static final String SUSPEND_CUSTOMER = "UPDATE `customer` SET `is_suspended` = ? WHERE `username` = ?";
 	//endregion
 
 	public MySQL(String host, int port, String dbname, String user, String pwd) {
@@ -201,7 +208,7 @@ public class MySQL {
 				reservations.add(new Reservation(
 						result.getInt("id"),
 						getTable(result.getInt("table_number")),
-						result.getString("customer"),
+						getUser(result.getString("customer")),
 						result.getInt("no_of_people"),
 						result.getTimestamp("reserve_time"),
 						result.getTimestamp("create_time"),
@@ -218,6 +225,56 @@ public class MySQL {
 		return reservations;
 	}
 
+	public User getUser(String user) {
+		PreparedStatement statement = null;
+		ResultSet result = null;
+		try {
+			statement = sql.prepareStatement(GET_USER);
+			statement.setString(1, user);
+			result = statement.executeQuery();
+			if (result.next()) {
+				return new User(
+						result.getString("username"),
+						result.getString("password"),
+						result.getString("email"),
+						result.getTimestamp("create_time"),
+						getCustomer(user));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(result, statement);
+		}
+		return null;
+	}
+
+	public Customer getCustomer(String user) {
+		PreparedStatement statement = null;
+		ResultSet result = null;
+		try {
+			statement = sql.prepareStatement(GET_CUSTOMER);
+			statement.setString(1, user);
+			result = statement.executeQuery();
+			if (result.next()) {
+				return new Customer(
+						result.getString("username"),
+						result.getString("name"),
+						result.getString("phone"),
+						result.getString("gender"),
+						result.getDate("dob"),
+						result.getBoolean("is_suspended")
+				);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(result, statement);
+		}
+		return null;
+	}
+
 	public Reservation getReservation(int id) {
 		Reservation reservation = null;
 		PreparedStatement statement = null;
@@ -230,7 +287,7 @@ public class MySQL {
 				reservation = new Reservation(
 						result.getInt("id"),
 						getTable(result.getInt("table_number")),
-						result.getString("customer"),
+						getUser(result.getString("customer")),
 						result.getInt("no_of_people"),
 						result.getTimestamp("reserve_time"),
 						result.getTimestamp("create_time"),
@@ -259,6 +316,75 @@ public class MySQL {
 		finally {
 			cleanup(null, statement);
 		}
+	}
+
+	public List<Customer> getCustomers() {
+		List<Customer> customers = new ArrayList<>();
+		PreparedStatement statement = null;
+		ResultSet result = null;
+		try {
+			statement = sql.prepareStatement(GET_CUSTOMERS);
+			result = statement.executeQuery();
+			while (result.next()) {
+				customers.add(new Customer(
+						result.getString("username"),
+						result.getString("name"),
+						result.getString("phone"),
+						result.getString("gender"),
+						result.getDate("dob"),
+						result.getBoolean("is_suspended")
+						)
+				);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(result, statement);
+		}
+		return customers;
+	}
+
+	public void suspendCustomer(Customer customer, boolean suspend) {
+		PreparedStatement statement = null;
+		try {
+			statement = sql.prepareStatement(SUSPEND_CUSTOMER);
+			statement.setBoolean(1, suspend);
+			statement.setString(2, customer.username());
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(null, statement);
+		}
+	}
+
+	public List<Customer> getCustomers(boolean suspended) {
+		List<Customer> customers = new ArrayList<>();
+		PreparedStatement statement = null;
+		ResultSet result = null;
+		try {
+			statement = sql.prepareStatement(GET_AVAILABLE_CUSTOMERS);
+			statement.setBoolean(1, suspended);
+			result = statement.executeQuery();
+			while (result.next()) {
+				customers.add(new Customer(
+						result.getString("username"),
+						result.getString("name"),
+						result.getString("phone"),
+						result.getString("gender"),
+						result.getDate("dob"),
+						result.getBoolean("is_suspended"))
+				);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(result, statement);
+		}
+		return customers;
 	}
 	//endregion
 }

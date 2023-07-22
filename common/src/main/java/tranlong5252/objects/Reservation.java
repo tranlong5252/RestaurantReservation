@@ -7,18 +7,18 @@ import java.time.LocalDateTime;
 
 public class Reservation {
 	private final int id;
-	private final String username;
+	private final User user;
 	private final Timestamp createdTime;
 	private Table table;
 	private int numberOfPeople;
 	private Timestamp reserveTime;
 	private ReserveStatus status;
 
-	public Reservation(int id, Table table, String username, int numberOfPeople,
+	public Reservation(int id, Table table, User user, int numberOfPeople,
 	                   Timestamp reserveTime, Timestamp createdTime, ReserveStatus status) {
 		this.id = id;
 		this.table = table;
-		this.username = username;
+		this.user = user;
 		this.numberOfPeople = numberOfPeople;
 		this.reserveTime = reserveTime;
 		this.createdTime = createdTime;
@@ -27,7 +27,14 @@ public class Reservation {
 
 	@Override
 	public String toString() {
-		return String.format("Reservation %d: Table %d | %d people | %s", id, table, numberOfPeople, reserveTime);
+		return String.format("Reservation ID: %d%n" +
+						"  Table: %s%n" +
+						"  Customer: %s%n" +
+						"  Number of people: %d%n" +
+						"  Reserve time: %s%n" +
+						"  Created time: %s%n" +
+						"  Status: %s%n",
+				id, table, user.username(), numberOfPeople, reserveTime, createdTime, status);
 	}
 
 	public int id() {
@@ -38,8 +45,8 @@ public class Reservation {
 		return table;
 	}
 
-	public String username() {
-		return username;
+	public User user() {
+		return user;
 	}
 
 	public int numberOfPeople() {

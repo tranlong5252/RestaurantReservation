@@ -48,14 +48,18 @@ public class ManageTableMenu extends HostMenu {
             return;
         }
         try {
-            System.out.print("Table number: ");
-            int number = Integer.parseInt(main.getScanner().nextLine());
+            System.out.print("Table number (Type \"Exit\" to cancel): ");
+            String prompt = main.getScanner().nextLine();
+            if (prompt.equalsIgnoreCase("exit")) {
+                System.out.println("Canceled!");
+                return;
+            }
+            int number = Integer.parseInt(prompt);
             var table = main.getMySQL().getTable(number);
             if (table == null) {
                 System.out.println("Table not found!");
                 return;
             }
-            System.out.printf("Table %d: %d seats | Type: %s\n", table.number(), table.capacity(), table.type());
             System.out.print("New seats: ");
             int capacity = Integer.parseInt(main.getScanner().nextLine());
             if (capacity < 0) {
@@ -65,7 +69,7 @@ public class ManageTableMenu extends HostMenu {
             System.out.print("New type: ");
             String type = main.getScanner().nextLine();
             main.getMySQL().updateTable(number, capacity, type);
-            System.out.println("Table updated!");
+            System.out.printf("Table updated successfully to %d: %d seats | Type: %s\n", table.number(), table.capacity(), table.type());
         } catch (NumberFormatException e) {
             System.out.println("Invalid input!");
         }
@@ -75,6 +79,10 @@ public class ManageTableMenu extends HostMenu {
         try {
             System.out.print("Table number: ");
             int number = Integer.parseInt(main.getScanner().nextLine());
+            if (main.getMySQL().getTable(number) != null) {
+                System.out.println("Table already exists!");
+                return;
+            }
             System.out.print("Table capacity: ");
             int capacity = Integer.parseInt(main.getScanner().nextLine());
             if (capacity < 0) {

@@ -10,6 +10,7 @@ public class ReservationsMenu extends HostMenu {
 	private final MainMenu mainMenu;
 	public ReservationsMenu(MainMenu mainMenu) {
 		this.mainMenu = mainMenu;
+		showMenu();
 	}
 
 	@Override
@@ -54,28 +55,11 @@ public class ReservationsMenu extends HostMenu {
 				System.out.println("Reservation not found!");
 				return;
 			}
-			System.out.println(reservation);
-			System.out.println("1. Change status");
-			System.out.println("2. Delete");
-			System.out.println("3. Back");
-			System.out.print("Your choice: ");
-			int choice = Integer.parseInt(main.getScanner().nextLine());
-			switch (choice) {
-				case 1 -> {
-					if (reservation.status().equals(ReserveStatus.CANCELLED)) {
-						System.out.println("Reservation is cancelled by the customer, can not change!");
-						return;
-					}
-					editStatusReservation(reservation);
-					editStatusReservation();
-				}
-				//case 2 -> deleteReservation(reservation);
-				case 3 -> showMenu();
-				default -> {
-					System.out.println("Invalid choice!");
-					editStatusReservation();
-				}
+			if (reservation.status().equals(ReserveStatus.CANCELLED)) {
+				System.out.println("Reservation is cancelled by the customer, can not change!");
+				return;
 			}
+			editStatusReservation(reservation);
 		} catch (NumberFormatException e) {
 			System.out.println("Invalid choice!");
 			showMenu();
@@ -97,7 +81,7 @@ public class ReservationsMenu extends HostMenu {
 				return;
 			}
 			main.getMySQL().changeStatusReservation(reservation, status);
-			System.out.printf("Status changed to %s!", status);
+			System.out.printf("Status changed to %s\n", status);
 		} catch (NumberFormatException e) {
 			System.out.println("Invalid choice!");
 		}
@@ -111,7 +95,7 @@ public class ReservationsMenu extends HostMenu {
 		else {
 			System.out.println("Reservations:");
 			for (int i = 0; i < reservations.size(); i++) {
-				System.out.printf("%d. %s\n", i + 1, reservations.get(i).toString());
+				System.out.printf("%d: %s\n", i + 1, reservations.get(i));
 			}
 		}
 		return reservations.size();

@@ -2,7 +2,6 @@ package tranlong5252;
 
 import tranlong5252.menu.LoginMenu;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,7 +37,6 @@ public class ReservationApplication {
         return scanner;
     }
 
-
     public String getUsername() {
         return username;
     }
@@ -47,7 +45,9 @@ public class ReservationApplication {
         this.username = username;
     }
 
-    public DateTimeFormatter getDateTimeFormatter() {
-        return DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    public String input() {
+        String s = scanner.nextLine();
+        if (s.isBlank()) s = input();
+        return s;
     }
 }

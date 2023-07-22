@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import tranlong5252.ReserveStatus;
+import tranlong5252.Utils;
 import tranlong5252.objects.Reservation;
 import tranlong5252.objects.Table;
 
@@ -27,7 +28,10 @@ public class ReserveMenu extends ClientMenu {
 			int choice = Integer.parseInt(main.getScanner().nextLine());
 			switch (choice) {
 				case 1 -> {
-					printReservations();
+					int size = printReservations();
+					if (size == 0) {
+						System.out.println("No reservations!");
+					}
 					showMenu();
 				}
 				case 2 -> {
@@ -36,6 +40,10 @@ public class ReserveMenu extends ClientMenu {
 				}
 				case 3 -> {
 					editReservation();
+					showMenu();
+				}
+				case 4 -> {
+					cancelReservation();
 					showMenu();
 				}
 				case 5 -> mainMenu.showMenu();
@@ -48,6 +56,31 @@ public class ReserveMenu extends ClientMenu {
 			System.out.println("Invalid choice!");
 			showMenu();
 		}
+	}
+
+	private void cancelReservation() {
+		int size = printReservations();
+		if (size == 0) {
+			System.out.println("No reservations to cancel!");
+			return;
+		}
+		System.out.println("Notice: Can not cancel reservation 2 hours before reservation time");
+
+		System.out.print("Reservation ID: ");
+		int id = Integer.parseInt(main.getScanner().nextLine());
+		Reservation reservation = main.getMySQL().getReservation(id);
+		if (reservation == null) {
+			System.out.println("Reservation not found!");
+			return;
+		}
+		System.out.println(reservation);
+		if (reservation.reserveTime().toLocalDateTime().isBefore(LocalDateTime.now().plusHours(2))) {
+			System.out.println("Can not cancel reservation 2 hours before reservation time");
+			return;
+		}
+		reservation.setStatus(ReserveStatus.CANCELLED);
+		main.getMySQL().updateReservation(reservation);
+		System.out.println("Reservation cancelled!");
 	}
 
 	private void editReservation() {
@@ -85,7 +118,7 @@ public class ReserveMenu extends ClientMenu {
 			int choice = Integer.parseInt(main.getScanner().nextLine());
 			switch (choice) {
 				case 1 -> {
-					List<Table> tables = main.getMySQL().getAvailableTables();
+					List<Table> tables = main.getMySQL().getAvailableTables(reservation.numberOfPeople());
 					tables.forEach(System.out::println);
 					System.out.print("Table number: ");
 					int number = Integer.parseInt(main.getScanner().nextLine());
@@ -117,7 +150,7 @@ public class ReserveMenu extends ClientMenu {
 				case 3 -> {
 					System.out.print("Reservation time (yyyy-MM-dd HH:mm): ");
 					String time = main.getScanner().nextLine();
-					reservation.setReserveTime(LocalDateTime.parse(time, main.getDateTimeFormatter()));
+					reservation.setReserveTime(LocalDateTime.parse(time, Utils.getDateTimeHourFormatter()));
 					System.out.println("Reservation time changed!");
 				}
 				case 4 -> {
@@ -132,6 +165,7 @@ public class ReserveMenu extends ClientMenu {
 					editReservation(reservation);
 				}
 			}
+			main.getMySQL().updateReservation(reservation);
 		} catch (NumberFormatException e) {
 			System.out.println("Invalid choice!");
 			editReservation(reservation);
@@ -139,7 +173,9 @@ public class ReserveMenu extends ClientMenu {
 	}
 
 	private void addReservation() {
-		List<Table> tables = main.getMySQL().getAvailableTables();
+		System.out.print("Number of seats: ");
+		int seats = Integer.parseInt(main.getScanner().nextLine());
+		List<Table> tables = main.getMySQL().getAvailableTables(seats);
 		tables.forEach(System.out::println);
 		System.out.print("Table number: ");
 		int number = Integer.parseInt(main.getScanner().nextLine());
@@ -149,8 +185,6 @@ public class ReserveMenu extends ClientMenu {
 			return;
 		}
 		System.out.println(table);
-		System.out.print("Number of seats: ");
-		int seats = Integer.parseInt(main.getScanner().nextLine());
 		if (seats > table.capacity()) {
 			System.out.println("Not enough seats!");
 			return;
@@ -158,9 +192,9 @@ public class ReserveMenu extends ClientMenu {
 		System.out.print("Date (dd/MM/yyyy HH:mm): ");
 		String timeStr = main.getScanner().nextLine();
 		try {
-			LocalDateTime time = LocalDateTime.parse(timeStr, main.getDateTimeFormatter());
-			if (time.isBefore(LocalDateTime.now())) {
-				System.out.println("Can not reserve the date in the past!");
+			LocalDateTime time = LocalDateTime.parse(timeStr, Utils.getDateTimeHourFormatter());
+			if (time.isBefore(LocalDateTime.now().plusHours(3))) {
+				System.out.println("Cannot reserve the date in the date before 3 hours from now");
 				return;
 			}
 			Reservation reservation = main.getMySQL().getReservation(number, time);
@@ -174,6 +208,7 @@ public class ReserveMenu extends ClientMenu {
 			}
 			System.out.println("Failed to add reservation!");
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Invalid date!");
 		}
 	}
