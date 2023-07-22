@@ -28,7 +28,7 @@ public class Reservation {
 	@Override
 	public String toString() {
 		return String.format("Reservation ID: %d%n" +
-						"  Table: %s%n" +
+						"  %s%n" +
 						"  Customer: %s%n" +
 						"  Number of people: %d%n" +
 						"  Reserve time: %s%n" +
