@@ -1,5 +1,6 @@
 package tranlong5252.objects;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Customer {
@@ -62,5 +63,16 @@ public class Customer {
 
 	public void setDob(Date dob) {
 		this.dob = dob;
+	}
+
+	@Override
+	public String toString() {
+		return "Username: " + username + "\n" +
+				"  Name: " + name + "\n" +
+				"  Phone: " + phone + "\n" +
+				"  Gender: " + gender + "\n" +
+				"  Date of birth: " + new SimpleDateFormat("dd/MM/yyyy").format(dob) + "\n" +
+				"  Suspended: " + (isSuspended? "Yes" : "No")
+				;
 	}
 }

@@ -52,16 +52,23 @@ public class CustomersMenu extends HostMenu {
 			System.out.println("No customers to un-suspend!");
 			return;
 		}
+		customers.forEach(System.out::println);
 		try {
 			var customer = getCustomer(true);
 			if (customer == null) {
 				return;
 			}
-			main.getMySQL().suspendCustomer(customer, false);
-			System.out.println("Customer is un-suspended!");
+			System.out.print("Are you sure you want to un-suspend this customer? (Y/N): ");
+			String prompt = main.getScanner().nextLine();
+			if (prompt.equalsIgnoreCase("y")) {
+				main.getMySQL().suspendCustomer(customer, true);
+				System.out.println("Customer un-suspended!");
+			} else {
+				System.out.println("Canceled!");
+			}
 		} catch (NumberFormatException e) {
 			System.out.println("Invalid choice!");
-			suspendCustomer();
+			unSuspendCustomer();
 		}
 	}
 
@@ -80,6 +87,7 @@ public class CustomersMenu extends HostMenu {
 			System.out.println("No customers to suspend!");
 			return;
 		}
+		customers.forEach(System.out::println);
 		try {
 			var customer = getCustomer(false);
 			if (customer == null) {
@@ -104,14 +112,14 @@ public class CustomersMenu extends HostMenu {
 		String username = main.getScanner().nextLine();
 		if (username.isBlank()) {
 			System.out.println("Invalid username!");
-			return getCustomer(suspended);
+			return null;
 		}
 		var customer = main.getMySQL().getCustomer(username);
 		if (customer == null) {
 			System.out.println("Customer not found!");
-			return getCustomer(suspended);
+			return null;
 		}
-		if (customer.isSuspended() == suspended) {
+		if (customer.isSuspended() != suspended) {
 			System.out.println("Customer is already " + (suspended ? "suspended" : "not suspended") + "!");
 			return null;
 		}
