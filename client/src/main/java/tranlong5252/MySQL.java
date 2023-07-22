@@ -28,7 +28,6 @@ public class MySQL {
 	private static final String LOGIN = "SELECT * FROM `user` WHERE `username` = ? AND `password` = ?";
 	private static final String REGISTER = "INSERT INTO `user` (`username`, `password`) VALUES (?, ?)";
 	//INFO
-	private static final String RESTAURANT_DETAILS = "SELECT * FROM `restaurant` WHERE `id` = 0";
 	private static final String GET_AVAILABLE_TABLES = """
 		SELECT * FROM `table` WHERE `capacity` >= ?
 		AND `number` NOT IN (
@@ -357,7 +356,6 @@ public class MySQL {
 	public void updateCustomerInfo(String username, String name, String phone, LocalDate dob, String gender) {
 		PreparedStatement statement = null;
 		try {
-			//(`username`, `name`, `phone`, `dob`, `gender`)
 			statement = sql.prepareStatement(UPDATE_CUSTOMER_INFORMATION);
 			statement.setString(1, username);
 			statement.setString(2, name);
